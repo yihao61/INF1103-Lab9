@@ -8,6 +8,8 @@ from product_factory import ProductFactory
 from supplier import Supplier
 
 
+# Predict first (2.3): an order whose lines add up to 250 returns 230.0 with
+# BulkDiscount(200, 20), then 225.0 after set_discount(PercentageDiscount(10)).
 class DiscountTests(unittest.TestCase):
     def setUp(self) -> None:
         supplier = Supplier("S001", "TechSupply Co", "sales@techsupply.com")
@@ -54,6 +56,15 @@ class DiscountTests(unittest.TestCase):
 
     def test_student_discount(self):
         self.assertAlmostEqual(self.make_order(StudentDiscount()).calculate_total(), 237.5)
+
+    def test_two_orders_can_share_one_strategy(self):
+        """Order -> DiscountStrategy is an association: the order uses the strategy, it does not own it."""
+        shared = PercentageDiscount(10)
+        order_a = self.make_order(shared)
+        order_b = self.make_order(shared)
+        self.assertIs(order_a._Order__discount, order_b._Order__discount)
+        self.assertAlmostEqual(order_a.calculate_total(), 225.0)
+        self.assertAlmostEqual(order_b.calculate_total(), 225.0)
 
     def test_order_has_no_discount_if_elif_logic(self):
         source = inspect.getsource(Order)
