@@ -1,13 +1,19 @@
 from product import Product
 from orderline import OrderLine
+from discount_strategy import DiscountStrategy, NoDiscount
 
 class Order:
     """An order. Composition: the Order creates and owns its OrderLine objects.
     The Products those lines refer to are NOT owned by the Order."""
 
-    def __init__(self, order_id: str):
+    def __init__(self, order_id: str, discount: DiscountStrategy | None = None):
         self.__order_id: str = order_id
         self.__order_lines: list[OrderLine] = []
+        # Association: the Order uses a DiscountStrategy but does not own it.
+        self.__discount: DiscountStrategy = discount if discount is not None else NoDiscount()
+
+    def set_discount(self, discount: DiscountStrategy) -> None:
+        self.__discount = discount
 
     def get_order_id(self) -> str:
         return self.__order_id
@@ -30,8 +36,9 @@ class Order:
         return False
 
     def calculate_total(self) -> float:
-        # Ask each OrderLine for its own subtotal.
-        return sum((line.calculate_subtotal() for line in self.__order_lines), 0.0)
+        # Add up the line subtotals, then let the strategy decide the discount.
+        total = sum((line.calculate_subtotal() for line in self.__order_lines), 0.0)
+        return self.__discount.apply(total)
 
     def display_all(self) -> None:
         lines = "-" * 100
