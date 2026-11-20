@@ -1,7 +1,6 @@
 import json
 import os
-from physical_product import PhysicalProduct
-from digital_product import DigitalProduct
+from product_factory import ProductFactory
 from supplier import Supplier
 from order import Order, OrderList
 from product import Product
@@ -91,9 +90,15 @@ def load_inventory(filepath: str, supplier_list: SupplierList | None = None) -> 
             item["_Product__supplier"] = existing
 
         if item.get("_DigitalProduct__download_size") is not None:
-            inv_list.append(DigitalProduct(**item))
+            product_type = "digital"
+            extra = item["_DigitalProduct__download_size"]
         else:
-            inv_list.append(PhysicalProduct(**item))
+            product_type = "physical"
+            extra = item["_PhysicalProduct__weight"]
+        inv_list.append(ProductFactory.create(product_type, item["_Product__id"],
+                                              item["_Product__name"], item["_Product__price"],
+                                              item["_Product__stock"], item["_Product__supplier"],
+                                              extra))
 
     if not inv_list:
         print("Inventory is empty.")

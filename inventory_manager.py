@@ -1,5 +1,4 @@
-from physical_product import PhysicalProduct
-from digital_product import DigitalProduct
+from product_factory import ProductFactory
 from supplier import Supplier
 from inventory import Inventory
 from supplier_list import SupplierList
@@ -119,10 +118,12 @@ def add_product(inventory: Inventory, supplier_list: SupplierList) -> None:
             progress+=1
         else:
             #create new digital product object
-            if prodtype == "Digital":    
-                new_product = DigitalProduct(product_id, product_name, product_price, product_stock, product_supplier , product_download_size)
+            if prodtype == "Digital":
+                new_product = ProductFactory.create("digital", product_id, product_name, product_price,
+                                                    product_stock, product_supplier, product_download_size)
             else:
-                new_product = PhysicalProduct(product_id, product_name, product_price, product_stock, product_supplier, product_weight)
+                new_product = ProductFactory.create("physical", product_id, product_name, product_price,
+                                                    product_stock, product_supplier, product_weight)
             Adding = False
 
     # Add the new product to the inventory
