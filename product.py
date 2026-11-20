@@ -7,6 +7,12 @@ class Product(ABC):
     # JSON record can be passed straight into the constructor with **item.
     def __init__(self, _Product__id: str, _Product__name: str, _Product__price: float,
                  _Product__stock: int, _Product__supplier: Supplier):
+        # Validation: Product owns the price and stock rules.
+        # Every subclass (Physical, Digital) inherits them (LSP).
+        if _Product__price <= 0:
+            raise ValueError("Price must be greater than zero.")
+        if _Product__stock < 0:
+            raise ValueError("Stock quantity cannot be negative.")
         self.__id: str = _Product__id
         self.__name: str = _Product__name
         self.__price: float = _Product__price
@@ -14,8 +20,9 @@ class Product(ABC):
         self.__supplier: Supplier = _Product__supplier
 
     def update_stock(self, quantity: int) -> None:
-        if quantity >= 0: 
-            self.__stock = quantity
+        if quantity < 0:
+            raise ValueError("Stock quantity cannot be negative.")
+        self.__stock = quantity
 
     def get_product_id(self) -> str:
         return self.__id
