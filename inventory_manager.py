@@ -32,6 +32,18 @@ def get_valid_input() -> int:
         except ValueError:
             print("Invalid Option entered, please try again.")       
 
+def get_positive_float(prompt: str) -> float:
+    """Keep asking until the user enters a number greater than zero."""
+    while True:
+        try:
+            value = float(input(prompt))
+            if value <= 0:
+                print("Please enter a number greater than zero.")
+                continue
+            return value
+        except ValueError:
+            print("Please enter a valid number, e.g. 12.50")
+
 def add_product(inventory: Inventory, supplier_list: SupplierList) -> None:
     Adding = True
     progress = 0
@@ -65,14 +77,7 @@ def add_product(inventory: Inventory, supplier_list: SupplierList) -> None:
             progress+=1
 
         elif progress == 3:     # Ask user for price
-            priceinp = input("Price: ")
-            try:
-                validp = float(priceinp)
-            except ValueError:
-                print("Not a number. Try Again")
-                continue
-    
-            product_price = validp
+            product_price = get_positive_float("Price: ")
             progress+=1
 
         elif progress == 4:     # Ask user for stock quantity
@@ -83,7 +88,11 @@ def add_product(inventory: Inventory, supplier_list: SupplierList) -> None:
             except ValueError:
                 print("Not a integer. Try Again!")
                 continue
-    
+
+            if valids < 0:
+                print("Stock quantity cannot be negative. Try Again!")
+                continue
+
             product_stock = valids
             progress+=1
 
